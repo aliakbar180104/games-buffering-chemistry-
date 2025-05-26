@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beffering Chemistry</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .info-panel {
+            display: flex;
+            justify-content: space-between;
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            text-align: center;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 1.2em;
+        }
+        
+        .hearts {
+            color: red;
+            font-size: 1.5em;
+        }
+        
+        .question-area {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .scenario {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .option {
+            padding: 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        
+        .option:hover {
+            background-color: #2980b9;
+        }
+        
+        .feedback {
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .correct {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .next-button {
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .next-button:hover {
+            background-color: #219653;
+        }
+        
+        .game-over, .start-screen {
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .restart-button, .start-button {
+            padding: 15px 30px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+        
+        .restart-button:hover, .start-button:hover {
+            background-color: #c0392b;
+        }
+        
+        .ph-meter {
+            width: 100%;
+            height: 30px;
+            background: linear-gradient(to right, #ff0000, #ff8000, #ffff00, #80ff00, #00ff00, #00ff80, #00ffff, #0080ff, #0000ff, #8000ff, #ff00ff);
+            border-radius: 15px;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .ph-indicator {
+            width: 10px;
+            height: 40px;
+            background-color: black;
+            position: absolute;
+            top: -5px;
+            transform: translateX(-50%);
+            transition: left 0.5s;
+        }
+        
+        .ph-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .final-score {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 20px 0;
+        }
+        
+        .instructions {
+            background-color: #fffde7;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 5px solid #fbc02d;
+        }
+        
+        .instructions h2 {
+            margin-top: 0;
+            color: #f57f17;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 600px) {
+            .info-panel {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Beffering Chemistry</h1>
+        
+        <div class="start-screen" id="startScreen">
+            <div class="instructions">
+                <h2>Peraturan Permainan:</h2>
+                <ul>
+                    <li>Kamu diberi satu larutan penyangga dengan pH tertentu</li>
+                    <li>Setiap ronde akan ada tantangan yang harus kamu hadapi</li>
+                    <li>Pilih 1 dari 3 opsi untuk menjaga kestabilan pH larutan</li>
+                    <li>Jawaban benar: +10 poin</li>
+                    <li>Jawaban salah: kehilangan 1 nyawa</li>
+                    <li>Kamu memiliki 3 nyawa di awal permainan</li>
+                </ul>
+            </div>
+            <p>Tunjukkan kemampuanmu dalam menjaga kestabilan larutan penyangga!</p>
+            <button class="start-button" id="startButton">Mulai Permainan</button>
+        </div>
+        
+        <div class="game-area hidden" id="gameArea">
+            <div class="info-panel">
+                <div class="info-item">
+                    <div class="info-label">Larutan:</div>
+                    <div class="info-value" id="bufferName">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">pH:</div>
+                    <div class="info-value" id="pHValue">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Nyawa:</div>
+                    <div class="hearts" id="hearts">❤️❤️❤️</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Skor:</div>
+                    <div class="info-value" id="score">0</div>
+                </div>
+            </div>
+            
+            <div class="ph-meter">
+                <div class="ph-indicator" id="phIndicator"></div>
+            </div>
+            <div class="ph-labels">
+                <span>0</span>
+                <span>1</span>
+                <span>2</span>
+                <span>3</span>
+                <span>4</span>
+                <span>5</span>
+                <span>6</span>
+                <span>7</span>
+                <span>8</span>
+                <span>9</span>
+                <span>10</span>
+                <span>11</span>
+                <span>12</span>
+                <span>13</span>
+                <span>14</span>
+            </div>
+            
+            <div class="question-area">
+                <div class="scenario" id="scenario">
+                    Pertanyaan akan muncul di sini...
+                </div>
+                <div class="options" id="options">
+                    <button class="option" id="option1">Opsi 1</button>
+                    <button class="option" id="option2">Opsi 2</button>
+                    <button class="option" id="option3">Opsi 3</button>
+                </div>
+                <div class="feedback" id="feedback"></div>
+                <button class="next-button" id="nextButton">Lanjut</button>
+            </div>
+        </div>
+        
+        <div class="game-over hidden" id="gameOver">
+            <h2>Permainan Selesai!</h2>
+            <p>Larutan penyangga tidak stabil lagi.</p>
+            <div class="final-score">Skor akhir: <span id="finalScore">0</span></div>
+            <button class="restart-button" id="restartButton">Main Lagi</button>
+        </div>
+    </div>
+
+    <script>
+        // Data permainan
+        const bufferSystems = [
+            {
+                name: "CH₃COOH/CH₃COONa",
+                initialPH: 4.7,
+                description: "Larutan penyangga asam asetat/natrium asetat"
+            },
+            {
+                name: "NH₄Cl/NH₃",
+                initialPH: 9.2,
+                description: "Larutan penyangga amonium klorida/amonia"
+            },
+            {
+                name: "H₂PO₄⁻/HPO₄²⁻",
+                initialPH: 7.2,
+                description: "Larutan penyangga dihidrogen fosfat/hidrogen fosfat"
+            },
+            {
+                name: "H₂CO₃/HCO₃⁻",
+                initialPH: 6.4,
+                description: "Larutan penyangga asam karbonat/bikarbonat"
+            }
+        ];
+
+        const scenarios = [
+            {
+                question: "Sejumlah asam kuat (HCl) ditambahkan ke larutan penyangga. Apa yang harus kamu lakukan untuk menjaga kestabilan pH?",
+                options: [
+                    { text: "Tambahkan lebih banyak basa konjugasi", correct: true, explanation: "Benar! Penambahan basa konjugasi akan menetralkan asam kuat yang ditambahkan." },
+                    { text: "Tambahkan lebih banyak asam kuat", correct: false, explanation: "Salah! Menambahkan lebih banyak asam kuat akan membuat pH semakin turun." },
+                    { text: "Tambahkan air murni", correct: false, explanation: "Salah! Penambahan air hanya akan mengencerkan larutan tanpa menetralkan asam yang ditambahkan." }
+                ]
+            },
+            {
+                question: "Sejumlah basa kuat (NaOH) ditambahkan ke larutan penyangga. Apa yang harus kamu lakukan untuk menjaga kestabilan pH?",
+                options: [
+                    { text: "Tambahkan lebih banyak asam lemah", correct: true, explanation: "Benar! Penambahan asam lemah akan menetralkan basa kuat yang ditambahkan." },
+                    { text: "Tambahkan lebih banyak basa kuat", correct: false, explanation: "Salah! Menambahkan lebih banyak basa kuat akan membuat pH semakin naik." },
+                    { text: "Tambahkan larutan garam netral", correct: false, explanation: "Salah! Penambahan garam netral tidak akan menetralkan basa yang ditambahkan." }
+                ]
+            },
+            {
+                question: "Larutan penyangga mengalami pengenceran dengan air. Apa yang terjadi pada pH larutan?",
+                options: [
+                    { text: "pH tetap sama", correct: true, explanation: "Benar! Salah satu sifat penting larutan penyangga adalah pH relatif tidak berubah saat pengenceran." },
+                    { text: "pH meningkat secara signifikan", correct: false, explanation: "Salah! Pengenceran larutan penyangga tidak menyebabkan perubahan pH yang signifikan." },
+                    { text: "pH menurun secara signifikan", correct: false, explanation: "Salah! Pengenceran larutan penyangga tidak menyebabkan perubahan pH yang signifikan." }
+                ]
+            },
+            {
+                question: "Suhu larutan penyangga meningkat. Bagaimana pengaruhnya terhadap kapasitas penyangga?",
+                options: [
+                    { text: "Kapasitas penyangga tidak terpengaruh signifikan", correct: true, explanation: "Benar! Perubahan suhu biasanya memiliki efek kecil pada kapasitas penyangga." },
+                    { text: "Kapasitas penyangga hilang sepenuhnya", correct: false, explanation: "Salah! Perubahan suhu tidak menghilangkan kapasitas penyangga sepenuhnya." },
+                    { text: "Kapasitas penyangga meningkat drastis", correct: false, explanation: "Salah! Perubahan suhu tidak meningkatkan kapasitas penyangga secara drastis." }
+                ]
+            },
+            {
+                question: "Bagaimana cara meningkatkan kapasitas larutan penyangga?",
+                options: [
+                    { text: "Meningkatkan konsentrasi komponen asam dan basa konjugasi dengan perbandingan tetap", correct: true, explanation: "Benar! Meningkatkan konsentrasi kedua komponen dengan perbandingan tetap akan meningkatkan kapasitas penyangga." },
+                    { text: "Mengurangi konsentrasi semua komponen", correct: false, explanation: "Salah! Pengurangan konsentrasi akan mengurangi kapasitas penyangga." },
+                    { text: "Hanya meningkatkan konsentrasi asam", correct: false, explanation: "Salah! Perbandingan asam dan basa konjugasi harus dijaga untuk mempertahankan pH yang sama." }
+                ]
+            },
+            {
+                question: "Sebuah indikator pH ditambahkan ke larutan penyangga. Apa yang akan terjadi jika pH larutan berubah?",
+                options: [
+                    { text: "Warna indikator akan berubah sesuai dengan perubahan pH", correct: true, explanation: "Benar! Indikator pH akan berubah warna sesuai dengan perubahan pH larutan." },
+                    { text: "Indikator akan mengendap", correct: false, explanation: "Salah! Indikator pH tidak mengendap karena perubahan pH." },
+                    { text: "Indikator akan merusak sistem penyangga", correct: false, explanation: "Salah! Indikator pH biasanya ditambahkan dalam jumlah kecil dan tidak mempengaruhi sistem penyangga." }
+                ]
+            },
+            {
+                question: "Bagaimana pengaruh penambahan garam NaCl pada larutan penyangga?",
+                options: [
+                    { text: "Tidak berpengaruh signifikan pada pH", correct: true, explanation: "Benar! Garam netral seperti NaCl tidak akan signifikan mempengaruhi pH larutan penyangga." },
+                    { text: "Membuat pH meningkat tajam", correct: false, explanation: "Salah! Garam netral tidak menyebabkan perubahan pH yang signifikan." },
+                    { text: "Menghilangkan kapasitas penyangga", correct: false, explanation: "Salah! Garam netral tidak menghilangkan kapasitas penyangga." }
+                ]
+            },
+            {
+                question: "Larutan penyangga asam asetat/natrium asetat (pH sekitar 4,7) perlu digunakan untuk eksperimen biokimia. Apa yang terjadi jika larutan ini digunakan untuk enzim yang bekerja optimal pada pH 7?",
+                options: [
+                    { text: "Aktivitas enzim akan berkurang", correct: true, explanation: "Benar! Enzim bekerja optimal pada pH tertentu, dan pH 4,7 terlalu asam untuk enzim yang optimal di pH 7." },
+                    { text: "Aktivitas enzim akan meningkat", correct: false, explanation: "Salah! Enzim ini bekerja optimal pada pH 7, bukan pada pH asam." },
+                    { text: "Enzim akan terdenaturasi seketika", correct: false, explanation: "Salah! Meskipun tidak optimal, enzim belum tentu terdenaturasi seketika pada pH 4,7." }
+                ]
+            },
+            {
+                question: "Kamu perlu membuat larutan penyangga dengan pH = pKa. Bagaimana perbandingan [asam lemah] dan [basa konjugasi] yang tepat?",
+                options: [
+                    { text: "[asam lemah] = [basa konjugasi]", correct: true, explanation: "Benar! Ketika pH = pKa, perbandingan [asam lemah] dan [basa konjugasi] adalah 1:1." },
+                    { text: "[asam lemah] > [basa konjugasi]", correct: false, explanation: "Salah! Ketika [asam lemah] > [basa konjugasi], pH < pKa." },
+                    { text: "[asam lemah] < [basa konjugasi]", correct: false, explanation: "Salah! Ketika [asam lemah] < [basa konjugasi], pH > pKa." }
+                ]
+            },
+            {
+                question: "Dalam percobaan titrasi asam lemah dengan basa kuat, kapan larutan penyangga terbentuk?",
+                options: [
+                    { text: "Sebelum titik ekivalen tercapai", correct: true, explanation: "Benar! Sebelum titik ekivalen, sebagian asam lemah dinetralkan membentuk basa konjugasi, menciptakan sistem penyangga." },
+                    { text: "Tepat pada titik ekivalen", correct: false, explanation: "Salah! Pada titik ekivalen, semua asam lemah telah dinetralkan menjadi basa konjugasi, tidak ada sistem penyangga." },
+                    { text: "Tidak pernah terbentuk selama titrasi", correct: false, explanation: "Salah! Larutan penyangga selalu terbentuk pada tahap tertentu selama titrasi asam lemah dengan basa kuat." }
+                ]
+            }
+        ];
+
+        // Variabel permainan
+        let currentBuffer;
+        let currentPH;
+        let lives;
+        let score;
+        let usedScenarios = [];
+
+        // Elemen DOM
+        const startScreen = document.getElementById('startScreen');
+        const gameArea = document.getElementById('gameArea');
+        const gameOver = document.getElementById('gameOver');
+        const bufferNameEl = document.getElementById('bufferName');
+        const pHValueEl = document.getElementById('pHValue');
+        const heartsEl = document.getElementById('hearts');
+        const scoreEl = document.getElementById('score');
+        const scenarioEl = document.getElementById('scenario');
+        const optionsEl = document.getElementById('options');
+        const feedbackEl = document.getElementById('feedback');
+        const nextButton = document.getElementById('nextButton');
+        const finalScoreEl = document.getElementById('finalScore');
+        const phIndicator = document.getElementById('phIndicator');
+        
+        // Tombol
+        const startButton = document.getElementById('startButton');
+        const restartButton = document.getElementById('restartButton');
+        const option1 = document.getElementById('option1');
+        const option2 = document.getElementById('option2');
+        const option3 = document.getElementById('option3');
+        
+        // Inisialisasi permainan
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', startGame);
+        nextButton.addEventListener('click', nextScenario);
+        
+        option1.addEventListener('click', () => checkAnswer(0));
+        option2.addEventListener('click', () => checkAnswer(1));
+        option3.addEventListener('click', () => checkAnswer(2));
+        
+        function startGame() {
+            // Reset variabel permainan
+            lives = 3;
+            score = 0;
+            usedScenarios = [];
+            
+            // Pilih sistem penyangga secara acak
+            currentBuffer = bufferSystems[Math.floor(Math.random() * bufferSystems.length)];
+            currentPH = currentBuffer.initialPH;
+            
+            // Update tampilan
+            updateDisplay();
+            
+            // Sembunyikan layar awal/game over, tampilkan area permainan
+            startScreen.classList.add('hidden');
+            gameOver.classList.add('hidden');
+            gameArea.classList.remove('hidden');
+            
+            // Mulai skenario pertama
+            nextScenario();
+        }
+        
+        function updateDisplay() {
+            // Update informasi permainan
+            bufferNameEl.textContent = currentBuffer.name;
+            pHValueEl.textContent = currentPH.toFixed(1);
+            heartsEl.textContent = '❤️'.repeat(lives);
+            scoreEl.textContent = score;
+            
+            // Update posisi indikator pH
+            const pHPercentage = (currentPH / 14) * 100;
+            phIndicator.style.left = `${pHPercentage}%`;
+        }
+        
+        function nextScenario() {
+            // Sembunyikan feedback dan tombol next
+            feedbackEl.style.display = 'none';
+            nextButton.style.display = 'none';
+            
+            // Aktifkan kembali tombol opsi
+            enableOptions();
+            
+            // Pilih skenario yang belum digunakan
+            let availableScenarios = scenarios.filter(
+                (_, index) => !usedScenarios.includes(index)
+            );
+            
+            // Jika semua skenario sudah digunakan, reset
+            if (availableScenarios.length === 0) {
+                usedScenarios = [];
+                availableScenarios = scenarios;
+            }
+            
+            // Pilih skenario acak
+            const randomIndex = Math.floor(Math.random() * availableScenarios.length);
+            const scenarioIndex = scenarios.indexOf(availableScenarios[randomIndex]);
+            usedScenarios.push(scenarioIndex);
+            
+            const scenario = scenarios[scenarioIndex];
+            
+            // Tampilkan skenario dan opsi
+            scenarioEl.textContent = scenario.question;
+            
+            // Acak urutan opsi
+            const shuffledOptions = [...scenario.options].sort(() => Math.random() - 0.5);
+            
+            option1.textContent = shuffledOptions[0].text;
+            option1.dataset.index = scenario.options.indexOf(shuffledOptions[0]);
+            
+            option2.textContent = shuffledOptions[1].text;
+            option2.dataset.index = scenario.options.indexOf(shuffledOptions[1]);
+            
+            option3.textContent = shuffledOptions[2].text;
+            option3.dataset.index = scenario.options.indexOf(shuffledOptions[2]);
+        }
+        
+        function checkAnswer(optionIndex) {
+            // Dapatkan indeks opsi asli
+            const originalIndex = parseInt(document.querySelectorAll('.option')[optionIndex].dataset.index);
+            const currentScenario = scenarios[usedScenarios[usedScenarios.length - 1]];
+            const isCorrect = currentScenario.options[originalIndex].correct;
+            
+            // Nonaktifkan semua tombol opsi
+            disableOptions();
+            
+            // Tampilkan feedback
+            feedbackEl.textContent = currentScenario.options[originalIndex].explanation;
+            feedbackEl.className = isCorrect ? 'feedback correct' : 'feedback incorrect';
+            feedbackEl.style.display = 'block';
+            
+            if (isCorrect) {
+                // Jawaban benar
+                score += 10;
+                scoreEl.textContent = score;
+            } else {
+                // Jawaban salah
+                lives--;
+                heartsEl.textContent = '❤️'.repeat(lives);
+                
+                // Tambahkan efek "tidak stabil" pada pH
+                if (Math.random() > 0.5) {
+                    currentPH += (Math.random() * 2);
+                } else {
+                    currentPH -= (Math.random() * 2);
+                }
+                
+                // Batasi nilai pH antara 0-14
+                currentPH = Math.max(0, Math.min(14, currentPH));
+                
+                updateDisplay();
+                
+                // Cek game over
+                if (lives <= 0) {
+                    setTimeout(endGame, 1500);
+                    return;
+                }
+            }
+            
+            // Tampilkan tombol next
+            nextButton.style.display = 'block';
+        }
+        
+        function disableOptions() {
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.disabled = true;
+                option.style.opacity = 0.7;
+                option.style.cursor = 'not-allowed';
+            });
+        }
+        
+        function enableOptions() {
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.disabled = false;
+                option.style.opacity = 1;
+                option.style.cursor = 'pointer';
+            });
+        }
+        
+        function endGame() {
+            // Sembunyikan area permainan dan tampilkan layar game over
+            gameArea.classList.add('hidden');
+            gameOver.classList.remove('hidden');
+            
+            // Tampilkan skor akhir
+            finalScoreEl.textContent = score;
+        }
+    </script>
+</body>
+</html>
